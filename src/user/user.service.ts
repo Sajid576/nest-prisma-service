@@ -9,52 +9,56 @@ import { createToken } from 'src/utils/jwt.service';
 import { Role } from 'src/common/roles';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { generateHashedData } from 'src/utils';
+import { BaseService } from 'src/common/query/base.service';
 
 dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
 @Injectable()
-export class UserService {
-  constructor(private prisma: PrismaService) {}
+export class UserService extends BaseService {
+  constructor(prisma: PrismaService) {
+    super(prisma, 'user');
+    //this.prisma=prisma;
+  }
 
   async validateLogin(email: string, password: string, role: Role) {
-    const userFromDb = await this.prisma.user.findUnique({
-      where: { email: email },
-    });
+    const result = await super.read({ email: email });
 
-    if (!userFromDb) {
+    const user = result[0];
+
+    if (!user) {
       throw {
         name: 'notFound',
         message: 'User does not exist',
       };
     }
 
-    if (!userFromDb.roles.includes(role)) {
+    if (!user.roles.includes(role)) {
       throw {
         name: 'notFound',
         message: 'User does not exist',
       };
     }
 
-    const isValidPass = await bcrypt.compare(password, userFromDb.password);
+    const isValidPass = await bcrypt.compare(password, user.password);
     if (!isValidPass) {
       throw {
         name: 'unauthorized',
         message: 'Password not matched',
       };
     } else {
-      const accessToken = createToken(email, userFromDb.roles);
-      return { token: accessToken, user: userFromDb };
+      const accessToken = createToken(email, user.roles);
+      return { token: accessToken, user };
     }
   }
 
   async registerUser(payload: CreateUserDto) {
     try {
-      const user = await this.prisma.user.findFirst({
-        where: { email: payload.email },
-      });
-      console.log('LOL', user);
+      const result = await super.read({ email: payload.email });
+
+      const user = result[0];
+
       if (user) {
         return {
           success: false,
@@ -72,14 +76,12 @@ export class UserService {
         };
       }
       const hashedPassword = await generateHashedData(payload.password);
-      const result = await this.prisma.user.create({
-        data: {
-          ...payload,
-          password: hashedPassword,
-        },
+      const response = await super.create({
+        ...payload,
+        password: hashedPassword,
       });
 
-      return { success: true, data: result };
+      return { success: true, data: response };
     } catch (error) {
       return {
         success: false,

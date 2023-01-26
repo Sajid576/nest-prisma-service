@@ -9,11 +9,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../common/authentication/auth.guard';
-import { ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiResponse,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { storage } from './file.config';
 
+@ApiTags('File')
 @Controller('api/v1/file')
 export class FileController {
   @UseGuards(AuthGuard)
