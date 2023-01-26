@@ -16,7 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import { env } from 'src/utils/env';
 import { storage } from './file.config';
 
 @ApiTags('File')
@@ -28,7 +28,7 @@ export class FileController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Return success code and uploaded file',
+    description: 'Return success code and uploaded file URL',
   })
   @ApiResponse({
     status: 403,
@@ -43,7 +43,7 @@ export class FileController {
     ),
   )
   async uploadFile(@UploadedFile() file: any) {
-    return file;
+    return env.BASE_URL + '/api/v1/file/' + file.filename;
   }
 
   @ApiOperation({ summary: 'Get file by fileId.' })

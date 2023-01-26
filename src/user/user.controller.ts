@@ -37,7 +37,7 @@ export class UserController {
   })
   @Post('/admin/register')
   async createAdmin(@Body() payload: CreateUserDto) {
-    const result = await this.userService.registerUser(payload);
+    const result = await this.userService.registerAdmin(payload);
     if (!result.success) {
       return new ResponseError(
         result.data,

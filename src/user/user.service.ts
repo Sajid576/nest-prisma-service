@@ -53,7 +53,7 @@ export class UserService extends BaseService {
     }
   }
 
-  async registerUser(payload: CreateUserDto) {
+  async registerAdmin(payload: CreateUserDto) {
     try {
       const result = await super.read({ email: payload.email });
 
@@ -79,6 +79,7 @@ export class UserService extends BaseService {
       const response = await super.create({
         ...payload,
         password: hashedPassword,
+        roles: [Role.Admin],
       });
 
       return { success: true, data: response };
