@@ -1,10 +1,9 @@
 import { Module, Logger, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MealModule } from './meal/meal.module';
-import { DishModule } from './dish/dish.module';
 import { UserModule } from './user/user.module';
-import { OrderModule } from './order/order.module';
+import { ProductModule } from './product/product.module';
+import { FileModule } from './file/file.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -29,10 +28,9 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
-    DishModule,
-    MealModule,
     UserModule,
-    OrderModule,
+    ProductModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
