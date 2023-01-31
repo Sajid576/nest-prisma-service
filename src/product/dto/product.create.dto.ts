@@ -21,6 +21,11 @@ export class ProductCreateDto {
   @ApiProperty({ description: 'Name' })
   name?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty({ description: 'Image URL' })
+  imageUrl?: string;
+
   @IsNumber()
   @IsOptional()
   @ApiProperty({ description: 'Quantity' })

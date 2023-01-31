@@ -11,29 +11,11 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class ProductSearchDto {
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsDate()
-  fromDate?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsDate()
-  toDate?: string;
-
+export class CategorySearchDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   key?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  @Transform(({ value }) => Number(value))
-  @ApiProperty({ description: 'Category ID' })
-  categoryId?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()

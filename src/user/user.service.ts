@@ -76,10 +76,14 @@ export class UserService extends BaseService {
         };
       }
       const hashedPassword = await generateHashedData(payload.password);
-      const response = await super.create({
-        ...payload,
-        password: hashedPassword,
-        roles: [Role.Admin],
+
+      const response = await this.prisma.$transaction(async (tx) => {
+        const product = await super.create(
+          { ...payload, password: hashedPassword, roles: [Role.Admin] },
+          tx,
+        );
+
+        return product;
       });
 
       return { success: true, data: response };

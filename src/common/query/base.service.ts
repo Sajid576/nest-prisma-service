@@ -9,17 +9,26 @@ export class BaseService {
     this.model = model;
   }
 
-  public async create(payload: any) {
-    return await (this.prisma as Record<string, any>)[this.model].create({
-      data: payload,
-    });
+  public async create(payload: any, transaction: any) {
+    return !transaction
+      ? await (this.prisma as Record<string, any>)[this.model].create({
+          data: payload,
+        })
+      : await transaction[this.model].create({
+          data: payload,
+        });
   }
 
-  public async update(where: any, payload: any) {
-    return await (this.prisma as Record<string, any>)[this.model].update({
-      data: payload,
-      where: where,
-    });
+  public async update(where: any, payload: any, transaction: any) {
+    return !transaction
+      ? await (this.prisma as Record<string, any>)[this.model].update({
+          data: payload,
+          where: where,
+        })
+      : await transaction[this.model].update({
+          data: payload,
+          where: where,
+        });
   }
 
   public async read(

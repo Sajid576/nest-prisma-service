@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ProductCreateDto, ProductSearchDto, ProductUpdateDto } from './dto';
+import { CategoryCreateDto, CategorySearchDto, CategoryUpdateDto } from './dto';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { BaseService } from 'src/common/query/base.service';
 
@@ -11,57 +11,34 @@ const ORDER = [
   },
 ];
 
-const INCLUDE = {
-  category: {
-    orderBy: {
-      name: 'desc',
-    },
-    select: {
-      name: true,
-    },
-  },
-};
+const INCLUDE = {};
 
 @Injectable()
-export class ProductService extends BaseService {
+export class CategoryService extends BaseService {
   constructor(prisma: PrismaService) {
-    super(prisma, 'product');
+    super(prisma, 'category');
     //this.prisma=prisma;
   }
 
-  private _castQuery(searchModel: ProductSearchDto) {
+  private _castQuery(searchModel: CategorySearchDto) {
     const query: any = { OR: [] };
-    const { key, categoryId } = searchModel;
+    const { key } = searchModel;
 
     if (key) {
-      const keywords = key.split(' ');
       query.OR.push({
         name: { contains: key, mode: 'insensitive' },
       });
-      query.OR.push({
-        tags: { has: key },
-      });
-      if (keywords.length > 1) {
-        keywords.map((keyword) => {
-          query.OR.push({
-            tags: { has: keyword },
-          });
-        });
-      }
-    }
-    if (categoryId) {
-      query.categoryId = categoryId;
     }
 
-    return query.OR.length === 0 && !query.categoryId ? null : query;
+    return query.OR.length === 0 ? null : query;
   }
 
-  public async create(payload: ProductCreateDto) {
+  public async create(payload: CategoryCreateDto) {
     try {
       const result = await this.prisma.$transaction(async (tx) => {
-        const product = await super.create(payload, tx);
+        const category = await super.create(payload, tx);
 
-        return product;
+        return category;
       });
 
       return { success: true, data: result };
@@ -70,7 +47,7 @@ export class ProductService extends BaseService {
     }
   }
 
-  public async find(searchModel: ProductSearchDto) {
+  public async find(searchModel: CategorySearchDto) {
     try {
       const query = this._castQuery(searchModel);
 
@@ -84,7 +61,7 @@ export class ProductService extends BaseService {
 
   public async findById(id: string) {
     try {
-      const result = await super.read({ id });
+      const result = await super.read({ id: Number(id) }, ['id', 'name']);
 
       return { success: true, data: result };
     } catch (err) {
@@ -92,12 +69,12 @@ export class ProductService extends BaseService {
     }
   }
 
-  public async update(id: string, payload: ProductUpdateDto) {
+  public async update(id: string, payload: CategoryUpdateDto) {
     try {
       const updatedPayload: any = { ...payload };
 
       const result = await this.prisma.$transaction(async (tx) => {
-        const product = await super.update(
+        const category = await super.update(
           {
             id: Number(id),
           },
@@ -105,7 +82,7 @@ export class ProductService extends BaseService {
           tx,
         );
 
-        return product;
+        return category;
       });
 
       return { success: true, data: result };
@@ -116,8 +93,8 @@ export class ProductService extends BaseService {
 
   public async remove(id: string) {
     try {
-      const result = super.delete({ id });
-      console.log('product delete', result);
+      const result = super.delete({ id: Number(id) });
+
       return { success: true, data: result };
     } catch (error) {
       return { success: false, data: error };
