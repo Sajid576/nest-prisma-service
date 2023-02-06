@@ -7,7 +7,7 @@ import { BaseService } from 'src/common/query/base.service';
 // import { getFormattedCurrentDatetime } from '../utils/datetime';
 const ORDER = [
   {
-    createdAt: 'desc',
+    createdAt: 'asc',
   },
 ];
 
@@ -74,7 +74,14 @@ export class ProductService extends BaseService {
     try {
       const query = this._castQuery(searchModel);
 
-      const result = await super.read(query);
+      const result = await super.read(
+        query,
+        ['id', 'name'],
+        null,
+        ORDER,
+        Number(searchModel.limit),
+        Number(searchModel.page),
+      );
 
       return { success: true, data: result };
     } catch (err) {
